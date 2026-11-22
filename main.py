@@ -15,8 +15,10 @@ from sqlalchemy import (
     ForeignKey,
     Integer,
     String,
+    UniqueConstraint,
     create_engine,
     event,
+    func,
     inspect,
     select,
     text,
@@ -97,6 +99,19 @@ class Song(Base):
         return self.owner.username if self.owner is not None else None
 
 
+class SongLike(Base):
+    __tablename__ = "song_likes"
+    __table_args__ = (UniqueConstraint("user_id", "song_id"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    song_id: Mapped[int] = mapped_column(
+        ForeignKey("songs.id", ondelete="CASCADE"), nullable=False
+    )
+
+
 Base.metadata.create_all(bind=engine)
 if "owner_id" not in {column["name"] for column in inspect(engine).get_columns("songs")}:
     with engine.begin() as connection:
@@ -139,8 +154,16 @@ class SongCreate(BaseModel):
 class SongResponse(SongCreate):
     id: int
     owner_username: str | None
+    like_count: int = 0
+    liked_by_me: bool = False
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class SongLikeResponse(BaseModel):
+    song_id: int
+    like_count: int
+    liked_by_me: bool
 
 
 def get_db() -> Generator[Session, None, None]:
@@ -246,12 +269,86 @@ def login(user_data: UserLogin, db: Session = Depends(get_db)) -> dict[str, str]
 @app.get("/api/songs", response_model=list[SongResponse])
 def list_songs(
     db: Session = Depends(get_db),
-    _current_user: User = Depends(get_current_user),
-) -> list[Song]:
-    return list(
-        db.scalars(
-            select(Song).options(selectinload(Song.owner)).order_by(Song.id)
-        ).all()
+    current_user: User = Depends(get_current_user),
+) -> list[SongResponse]:
+    like_count = (
+        select(func.count(SongLike.id))
+        .where(SongLike.song_id == Song.id)
+        .correlate(Song)
+        .scalar_subquery()
+    )
+    liked_by_me = (
+        select(SongLike.id)
+        .where(
+            SongLike.song_id == Song.id,
+            SongLike.user_id == current_user.id,
+        )
+        .exists()
+    )
+    rows = db.execute(
+        select(Song, like_count.label("like_count"), liked_by_me.label("liked_by_me"))
+        .options(selectinload(Song.owner))
+        .order_by(Song.id)
+    ).all()
+    return [
+        SongResponse.model_validate(song).model_copy(
+            update={"like_count": count, "liked_by_me": liked}
+        )
+        for song, count, liked in rows
+    ]
+
+
+@app.post("/api/songs/{song_id}/like", response_model=SongLikeResponse)
+def toggle_song_like(
+    song_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> SongLikeResponse:
+    if db.get(Song, song_id) is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Song not found",
+        )
+
+    existing_like = db.scalar(
+        select(SongLike).where(
+            SongLike.song_id == song_id,
+            SongLike.user_id == current_user.id,
+        )
+    )
+    if existing_like is not None:
+        db.delete(existing_like)
+    else:
+        db.add(SongLike(song_id=song_id, user_id=current_user.id))
+
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        if db.scalar(
+            select(SongLike.id).where(
+                SongLike.song_id == song_id,
+                SongLike.user_id == current_user.id,
+            )
+        ) is None:
+            raise
+
+    like_count = db.scalar(
+        select(func.count(SongLike.id)).where(SongLike.song_id == song_id)
+    )
+    liked_by_me = (
+        db.scalar(
+            select(SongLike.id).where(
+                SongLike.song_id == song_id,
+                SongLike.user_id == current_user.id,
+            )
+        )
+        is not None
+    )
+    return SongLikeResponse(
+        song_id=song_id,
+        like_count=like_count or 0,
+        liked_by_me=liked_by_me,
     )
 
 
