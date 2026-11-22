@@ -7,6 +7,11 @@
       name="theme-color"
       content="#101410"
     />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='31' fill='%23101410'/%3E%3Ccircle cx='32' cy='32' r='27' fill='none' stroke='%23c8f560' stroke-opacity='.28'/%3E%3Cpath d='M14 29v6m8-13v20m8-27v34m8-26v18m8-12v6' fill='none' stroke='%23c8f560' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E"
+    />
     <title>NoiseSwap</title>
     <style>
       :root {
@@ -20,7 +25,7 @@
         --muted: #a4a99e;
         --line: rgba(235, 239, 222, 0.13);
         --panel: rgba(24, 29, 24, 0.88);
-        --accent: #c9ef77;
+        --accent: #c8f560;
         --accent-ink: #1d2811;
         --danger: #ffb6a8;
       }
@@ -38,6 +43,34 @@
           radial-gradient(ellipse at 75% 4%, rgba(116, 145, 71, 0.16), transparent 34rem),
           radial-gradient(ellipse at 4% 72%, rgba(74, 103, 90, 0.13), transparent 30rem),
           #101410;
+      }
+
+      body::before {
+        position: fixed;
+        z-index: 0;
+        background-image:
+          linear-gradient(rgba(200, 245, 96, 0.018) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(200, 245, 96, 0.018) 1px, transparent 1px);
+        background-size: 46px 46px;
+        content: "";
+        inset: 0;
+        mask-image: linear-gradient(to bottom, black, transparent 78%);
+        pointer-events: none;
+      }
+
+      #app {
+        position: relative;
+        z-index: 1;
+        isolation: isolate;
+      }
+
+      .visualizer-canvas {
+        position: fixed;
+        z-index: -1;
+        width: 100%;
+        height: 100%;
+        inset: 0;
+        pointer-events: none;
       }
 
       button,
@@ -88,6 +121,30 @@
       .brand-mark svg {
         width: 19px;
         height: 19px;
+      }
+
+      .brand-equalizer {
+        display: inline-flex;
+        height: 18px;
+        align-items: center;
+        gap: 3px;
+        margin-left: -5px;
+        color: var(--accent);
+      }
+
+      .brand-equalizer span {
+        width: 3px;
+        border-radius: 3px;
+        background: currentColor;
+        animation: equalize 850ms ease-in-out infinite alternate;
+      }
+
+      .brand-equalizer span:nth-child(1) { height: 7px; animation-delay: -500ms; }
+      .brand-equalizer span:nth-child(2) { height: 15px; animation-delay: -150ms; }
+      .brand-equalizer span:nth-child(3) { height: 10px; animation-delay: -650ms; }
+
+      @keyframes equalize {
+        to { transform: scaleY(0.45); opacity: 0.6; }
       }
 
       .button {
@@ -181,10 +238,11 @@
         width: min(100%, 430px);
         margin: 0 auto 80px;
         padding: 30px;
-        border: 1px solid var(--line);
+        border: 1px solid rgba(235, 239, 222, 0.18);
         border-radius: 22px;
-        background: var(--panel);
-        box-shadow: 0 22px 80px rgba(0, 0, 0, 0.2);
+        background: rgba(18, 24, 19, 0.72);
+        box-shadow: 0 22px 80px rgba(0, 0, 0, 0.28), inset 0 1px rgba(255, 255, 255, 0.04);
+        backdrop-filter: blur(18px);
       }
 
       .auth-card h2,
@@ -281,6 +339,7 @@
 
       .songs-area {
         padding: 64px 0 90px;
+        background: radial-gradient(ellipse at 50% 0, rgba(200, 245, 96, 0.035), transparent 45rem);
       }
 
       .section-heading {
@@ -396,6 +455,13 @@
         border: 1px solid var(--line);
         border-radius: 17px;
         background: var(--panel);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+        transition: border-color 180ms ease, box-shadow 180ms ease;
+      }
+
+      .table-wrap:hover {
+        border-color: rgba(200, 245, 96, 0.2);
+        box-shadow: 0 22px 64px rgba(0, 0, 0, 0.2);
       }
 
       .songs-table {
@@ -432,6 +498,20 @@
         background: rgba(255, 255, 255, 0.025);
       }
 
+      .genre-badge {
+        display: inline-flex;
+        min-height: 27px;
+        align-items: center;
+        padding: 3px 10px;
+        border: 1px solid rgba(200, 245, 96, 0.24);
+        border-radius: 999px;
+        background: rgba(200, 245, 96, 0.09);
+        color: #d7f694;
+        font-size: 0.77rem;
+        font-weight: 700;
+        line-height: 1.25;
+      }
+
       .row-action-button {
         min-height: 36px;
         padding: 0 12px;
@@ -459,6 +539,8 @@
       .thumbnail-link,
       .thumbnail-placeholder {
         display: grid;
+        position: relative;
+        z-index: 1;
         width: 112px;
         height: 63px;
         overflow: hidden;
@@ -466,6 +548,28 @@
         border: 1px solid var(--line);
         border-radius: 9px;
         background: #20271d;
+      }
+
+      .songs-table tbody td:first-child {
+        position: relative;
+        isolation: isolate;
+      }
+
+      .songs-table tbody td:first-child::before {
+        position: absolute;
+        z-index: 0;
+        top: 50%;
+        left: 103px;
+        width: 52px;
+        height: 52px;
+        border: 1px solid rgba(200, 245, 96, 0.3);
+        border-radius: 50%;
+        background:
+          repeating-radial-gradient(circle, transparent 0 5px, rgba(200, 245, 96, 0.2) 6px 7px),
+          radial-gradient(circle, #303a21 0 15%, #151a13 16% 100%);
+        box-shadow: 0 0 20px rgba(200, 245, 96, 0.12);
+        content: "";
+        transform: translateY(-50%);
       }
 
       .thumbnail-link img {
@@ -509,29 +613,45 @@
         text-align: center;
       }
 
-      @media (max-width: 600px) {
+      @media (max-width: 768px) {
         .shell {
-          width: min(100% - 32px, 1120px);
+          width: min(100% - 36px, 1120px);
         }
 
         .topbar {
-          min-height: 76px;
+          min-height: 72px;
         }
 
         .intro {
-          margin: 60px auto 30px;
+          margin: 50px auto 28px;
+        }
+
+        .intro h1 {
+          font-size: clamp(2.35rem, 11vw, 3.6rem);
+          line-height: 1;
+        }
+
+        .intro-copy {
+          max-width: 360px;
+          font-size: 0.94rem;
         }
 
         .auth-card {
-          padding: 24px 20px;
+          padding: 25px 22px;
         }
 
         .songs-area {
-          padding-top: 48px;
+          padding: 42px 0 64px;
         }
 
         .section-heading {
           align-items: flex-start;
+          gap: 12px;
+        }
+
+        .section-heading > .button {
+          flex-shrink: 0;
+          padding: 0 12px;
         }
 
         .song-toolbar {
@@ -557,11 +677,174 @@
         .song-form-actions .button {
           width: 100%;
         }
+
+        .table-wrap {
+          overflow: visible;
+          border: 0;
+          background: transparent;
+          box-shadow: none;
+        }
+
+        .songs-table,
+        .songs-table tbody {
+          display: block;
+          width: 100%;
+          min-width: 0;
+        }
+
+        .songs-table thead {
+          display: none;
+        }
+
+        .songs-table tbody tr {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr);
+          gap: 0;
+          margin-bottom: 14px;
+          overflow: hidden;
+          border: 1px solid var(--line);
+          border-radius: 16px;
+          background: rgba(24, 29, 24, 0.9);
+          box-shadow: 0 14px 36px rgba(0, 0, 0, 0.17);
+          transition: transform 180ms ease, border-color 180ms ease;
+        }
+
+        .songs-table tbody tr:hover {
+          border-color: rgba(200, 245, 96, 0.26);
+          background: rgba(27, 34, 26, 0.96);
+          transform: translateY(-2px);
+        }
+
+        .songs-table tbody tr:last-child {
+          margin-bottom: 0;
+        }
+
+        .songs-table tbody td {
+          display: grid;
+          grid-template-columns: minmax(96px, 34%) minmax(0, 1fr);
+          align-items: center;
+          gap: 12px;
+          min-width: 0;
+          padding: 11px 15px;
+          border-bottom: 1px solid rgba(235, 239, 222, 0.08);
+          overflow-wrap: anywhere;
+          font-size: 0.87rem;
+        }
+
+        .songs-table tbody td::before {
+          color: var(--muted);
+          content: attr(data-label);
+          font-size: 0.72rem;
+          font-weight: 700;
+          letter-spacing: 0.035em;
+        }
+
+        .songs-table tbody td:first-child {
+          min-height: 108px;
+          padding-top: 16px;
+          padding-bottom: 16px;
+        }
+
+        .songs-table tbody td:first-child::before {
+          content: "Sampul YouTube";
+        }
+
+        .songs-table tbody td:first-child::after {
+          display: none;
+        }
+
+        .songs-table tbody td:first-child::before {
+          position: static;
+          width: auto;
+          height: auto;
+          border: 0;
+          border-radius: 0;
+          background: none;
+          box-shadow: none;
+          transform: none;
+        }
+
+        .thumbnail-link,
+        .thumbnail-placeholder {
+          width: min(100%, 148px);
+          height: 84px;
+          box-shadow: 0 0 0 1px rgba(200, 245, 96, 0.08);
+        }
+
+        .songs-table tbody td:first-child .thumbnail-link,
+        .songs-table tbody td:first-child .thumbnail-placeholder {
+          margin-right: 7px;
+        }
+
+        .songs-table tbody td:nth-child(2) {
+          color: #fff;
+          font-weight: 700;
+        }
+
+        .songs-table tbody td:last-child {
+          border-bottom: 0;
+        }
+
+        .row-actions {
+          gap: 8px;
+        }
+
+        .row-action-button {
+          min-height: 42px;
+          padding: 0 16px;
+        }
+      }
+
+      @media (max-width: 420px) {
+        .shell {
+          width: min(100% - 28px, 1120px);
+        }
+
+        .brand {
+          gap: 9px;
+          font-size: 1.05rem;
+        }
+
+        .section-heading {
+          flex-direction: column;
+        }
+
+        .section-heading > .button {
+          width: 100%;
+        }
+
+        .auth-card {
+          padding: 23px 18px;
+        }
+
+        .songs-table tbody td {
+          grid-template-columns: minmax(86px, 32%) minmax(0, 1fr);
+          gap: 9px;
+          padding-right: 12px;
+          padding-left: 12px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          scroll-behavior: auto !important;
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
       }
     </style>
   </head>
   <body>
     <div id="app">
+      <canvas
+        v-show="!token"
+        ref="visualizerCanvas"
+        class="visualizer-canvas"
+        aria-hidden="true"
+      ></canvas>
       <header class="topbar shell">
         <a class="brand" href="#" aria-label="NoiseSwap">
           <span class="brand-mark" aria-hidden="true">
@@ -575,6 +858,9 @@
             </svg>
           </span>
           <span>NoiseSwap</span>
+          <span class="brand-equalizer" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </span>
         </a>
         <button
           v-if="token"
@@ -714,7 +1000,7 @@
                     type="text"
                     autocomplete="off"
                     required
-                    @input="clearSongFieldError('title')"
+                    @input="titleCaseSongInput($event, 'title')"
                   />
                   <p v-if="songFieldErrors.title" class="field-error">
                     {{ songFieldErrors.title }}
@@ -731,7 +1017,7 @@
                     type="text"
                     autocomplete="off"
                     required
-                    @input="clearSongFieldError('artist')"
+                    @input="titleCaseSongInput($event, 'artist')"
                   />
                   <p v-if="songFieldErrors.artist" class="field-error">
                     {{ songFieldErrors.artist }}
@@ -748,7 +1034,7 @@
                     type="text"
                     autocomplete="off"
                     required
-                    @input="clearSongFieldError('genre')"
+                    @input="titleCaseSongInput($event, 'genre')"
                   />
                   <p v-if="songFieldErrors.genre" class="field-error">
                     {{ songFieldErrors.genre }}
@@ -849,11 +1135,11 @@
                       Tidak tersedia
                     </span>
                   </td>
-                  <td>{{ song.title }}</td>
-                  <td>{{ song.artist }}</td>
-                  <td>{{ song.genre }}</td>
-                  <td>{{ song.owner_username || 'Tidak diketahui' }}</td>
-                  <td>
+                  <td data-label="Judul Lagu">{{ song.title }}</td>
+                  <td data-label="Nama Artis">{{ song.artist }}</td>
+                  <td data-label="Genre"><span class="genre-badge">{{ song.genre }}</span></td>
+                  <td data-label="Ditambahkan oleh">{{ song.owner_username || 'Tidak diketahui' }}</td>
+                  <td data-label="Aksi">
                     <div
                       v-if="song.owner_username === loggedInUsername"
                       class="row-actions"
@@ -890,7 +1176,7 @@
     </div>
 
     <script type="module">
-      import { computed, createApp, onMounted, reactive, ref } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js';
+      import { computed, createApp, onBeforeUnmount, onMounted, reactive, ref, watch } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js';
 
       const API_URL = '/api';
 
@@ -920,6 +1206,7 @@
       createApp({
         setup() {
           const token = ref(localStorage.getItem('access_token'));
+          const visualizerCanvas = ref(null);
           const loggedInUsername = ref(usernameFromToken(token.value || ''));
           const isRegister = ref(false);
           const busy = ref(false);
@@ -1012,6 +1299,29 @@
           function clearSongFieldError(field) {
             songFieldErrors[field] = '';
             songFormNotice.value = '';
+          }
+
+          function titleCase(value) {
+            return value.replace(/(^|[\s-])(\p{L})/gu, (match, separator, letter) =>
+              `${separator}${letter.toLocaleUpperCase()}`,
+            );
+          }
+
+          function titleCaseSongInput(event, field) {
+            const input = event.target;
+            const originalValue = input.value;
+            const selectionStart = input.selectionStart;
+            const selectionEnd = input.selectionEnd;
+            const formattedValue = titleCase(originalValue);
+            input.value = formattedValue;
+            songForm[field] = formattedValue;
+            if (selectionStart !== null && selectionEnd !== null) {
+              input.setSelectionRange(
+                titleCase(originalValue.slice(0, selectionStart)).length,
+                titleCase(originalValue.slice(0, selectionEnd)).length,
+              );
+            }
+            clearSongFieldError(field);
           }
 
           function editSong(song) {
@@ -1230,12 +1540,137 @@
             isRegister.value = false;
           }
 
+          let visualizerFrame = 0;
+          let startVisualizer = () => {};
+          let resizeVisualizer = () => {};
+          let updatePointer = () => {};
+
           onMounted(() => {
+            const canvas = visualizerCanvas.value;
+            const context = canvas?.getContext('2d');
+            if (canvas && context) {
+              const particles = Array.from({ length: 34 }, (_, index) => ({
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                speed: 0.12 + Math.random() * 0.34,
+                phase: Math.random() * Math.PI * 2,
+                size: index % 4 === 0 ? 13 + Math.random() * 8 : 1.2 + Math.random() * 2.2,
+                note: index % 4 === 0,
+              }));
+              const pointer = { x: -1000, y: -1000, activeAt: 0 };
+              let width = 0;
+              let height = 0;
+              let wasActive = false;
+
+              resizeVisualizer = () => {
+                const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = Math.round(width * pixelRatio);
+                canvas.height = Math.round(height * pixelRatio);
+                context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+              };
+
+              updatePointer = (event) => {
+                pointer.x = event.clientX;
+                pointer.y = event.clientY;
+                pointer.activeAt = performance.now();
+              };
+
+              function drawVisualizer(now) {
+                if (token.value) {
+                  if (wasActive) context.clearRect(0, 0, width, height);
+                  wasActive = false;
+                  visualizerFrame = 0;
+                  return;
+                }
+                visualizerFrame = window.requestAnimationFrame(drawVisualizer);
+                wasActive = true;
+                context.clearRect(0, 0, width, height);
+
+                const pointerAge = now - pointer.activeAt;
+                const rippleStrength = Math.max(0, 1 - pointerAge / 1100);
+                for (let wave = 0; wave < 3; wave += 1) {
+                  const centerY = height * (0.32 + wave * 0.19);
+                  const amplitude = 13 + wave * 8;
+                  context.beginPath();
+                  for (let x = 0; x <= width; x += 5) {
+                    const distance = Math.abs(x - pointer.x);
+                    const ripple = rippleStrength * Math.max(0, 1 - distance / 280) * 22;
+                    const y =
+                      centerY +
+                      Math.sin(x * 0.009 + now * 0.0007 + wave * 1.4) * amplitude +
+                      Math.sin(x * 0.021 - now * 0.00045 + wave) * (amplitude * 0.28) +
+                      Math.sin(x * 0.018 + now * 0.001) * ripple;
+                    if (x === 0) context.moveTo(x, y);
+                    else context.lineTo(x, y);
+                  }
+                  context.strokeStyle = `rgba(200, 245, 96, ${0.08 - wave * 0.014})`;
+                  context.lineWidth = wave === 0 ? 1.5 : 1;
+                  context.shadowBlur = 18;
+                  context.shadowColor = 'rgba(200, 245, 96, 0.45)';
+                  context.stroke();
+                }
+                context.shadowBlur = 0;
+
+                for (const particle of particles) {
+                  particle.y -= particle.speed;
+                  particle.phase += 0.012;
+                  if (particle.y < -24) {
+                    particle.y = height + 20;
+                    particle.x = Math.random() * width;
+                  }
+                  const dx = particle.x - pointer.x;
+                  const dy = particle.y - pointer.y;
+                  const distance = Math.hypot(dx, dy);
+                  if (distance < 135 && distance > 0) {
+                    const force = (1 - distance / 135) * rippleStrength;
+                    particle.x += (dx / distance) * force * 1.8;
+                    particle.y += (dy / distance) * force * 1.8;
+                  }
+                  const pulse = 0.5 + Math.sin(particle.phase) * 0.2;
+                  context.globalAlpha = pulse;
+                  context.fillStyle = '#c8f560';
+                  if (particle.note) {
+                    context.font = `${particle.size}px serif`;
+                    context.fillText('♪', particle.x, particle.y);
+                  } else {
+                    context.beginPath();
+                    context.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                    context.fill();
+                  }
+                }
+                context.globalAlpha = 1;
+              }
+
+              startVisualizer = () => {
+                if (!token.value && !visualizerFrame) {
+                  visualizerFrame = window.requestAnimationFrame(drawVisualizer);
+                }
+              };
+              resizeVisualizer();
+              window.addEventListener('resize', resizeVisualizer);
+              window.addEventListener('pointermove', updatePointer, { passive: true });
+              window.addEventListener('pointerdown', updatePointer, { passive: true });
+              startVisualizer();
+            }
             if (token.value) loadSongs();
+          });
+
+          watch(token, (accessToken) => {
+            if (!accessToken) startVisualizer();
+          });
+
+          onBeforeUnmount(() => {
+            window.cancelAnimationFrame(visualizerFrame);
+            window.removeEventListener('resize', resizeVisualizer);
+            window.removeEventListener('pointermove', updatePointer);
+            window.removeEventListener('pointerdown', updatePointer);
           });
 
           return {
             token,
+            visualizerCanvas,
             loggedInUsername,
             isRegister,
             busy,
@@ -1258,6 +1693,7 @@
             submitAuth,
             loadSongs,
             clearSongFieldError,
+            titleCaseSongInput,
             editSong,
             resetSongForm,
             saveSong,
