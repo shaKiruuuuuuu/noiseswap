@@ -1,0 +1,1272 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="theme-color"
+      content="#101410"
+    />
+    <title>NoiseSwap</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        --ink: #f1f0e9;
+        --muted: #a4a99e;
+        --line: rgba(235, 239, 222, 0.13);
+        --panel: rgba(24, 29, 24, 0.88);
+        --accent: #c9ef77;
+        --accent-ink: #1d2811;
+        --danger: #ffb6a8;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-width: 320px;
+        min-height: 100vh;
+        margin: 0;
+        color: var(--ink);
+        background:
+          radial-gradient(ellipse at 75% 4%, rgba(116, 145, 71, 0.16), transparent 34rem),
+          radial-gradient(ellipse at 4% 72%, rgba(74, 103, 90, 0.13), transparent 30rem),
+          #101410;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      button,
+      a {
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .shell {
+        width: min(100% - 48px, 1120px);
+        margin: 0 auto;
+      }
+
+      .topbar {
+        display: flex;
+        min-height: 92px;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        color: var(--ink);
+        font-size: 1.15rem;
+        font-weight: 750;
+        letter-spacing: -0.045em;
+        text-decoration: none;
+      }
+
+      .brand-mark {
+        display: grid;
+        width: 36px;
+        height: 36px;
+        place-items: center;
+        border: 1px solid rgba(201, 239, 119, 0.38);
+        border-radius: 12px;
+        background: rgba(201, 239, 119, 0.1);
+        color: var(--accent);
+      }
+
+      .brand-mark svg {
+        width: 19px;
+        height: 19px;
+      }
+
+      .button {
+        display: inline-flex;
+        min-height: 44px;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 0 17px;
+        border: 1px solid transparent;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: 700;
+        transition:
+          transform 160ms ease,
+          background 160ms ease,
+          border-color 160ms ease;
+      }
+
+      .button:hover:not(:disabled) {
+        transform: translateY(-1px);
+      }
+
+      .button:disabled {
+        cursor: wait;
+        opacity: 0.65;
+      }
+
+      .button-primary {
+        background: var(--accent);
+        color: var(--accent-ink);
+      }
+
+      .button-primary:hover:not(:disabled) {
+        background: #d7f694;
+      }
+
+      .button-quiet {
+        border-color: var(--line);
+        background: rgba(255, 255, 255, 0.035);
+        color: var(--ink);
+      }
+
+      .button-quiet:hover:not(:disabled) {
+        border-color: rgba(235, 239, 222, 0.27);
+        background: rgba(255, 255, 255, 0.07);
+      }
+
+      .intro {
+        max-width: 660px;
+        margin: 80px auto 38px;
+        text-align: center;
+      }
+
+      .eyebrow {
+        margin: 0 0 17px;
+        color: var(--accent);
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.19em;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      p {
+        margin-top: 0;
+      }
+
+      .intro h1 {
+        margin-bottom: 14px;
+        font-size: clamp(2.6rem, 7vw, 4.7rem);
+        font-weight: 650;
+        letter-spacing: -0.075em;
+        line-height: 0.98;
+      }
+
+      .intro h1 span {
+        color: var(--accent);
+      }
+
+      .intro-copy {
+        max-width: 440px;
+        margin: 0 auto;
+        color: var(--muted);
+        font-size: 1rem;
+        line-height: 1.7;
+      }
+
+      .auth-card {
+        width: min(100%, 430px);
+        margin: 0 auto 80px;
+        padding: 30px;
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        background: var(--panel);
+        box-shadow: 0 22px 80px rgba(0, 0, 0, 0.2);
+      }
+
+      .auth-card h2,
+      .section-heading h2 {
+        margin-bottom: 8px;
+        font-size: 1.45rem;
+        letter-spacing: -0.045em;
+      }
+
+      .card-copy {
+        margin-bottom: 26px;
+        color: var(--muted);
+        font-size: 0.9rem;
+        line-height: 1.55;
+      }
+
+      .field {
+        display: grid;
+        gap: 9px;
+        margin-bottom: 18px;
+      }
+
+      .field label {
+        color: #d9ddd1;
+        font-size: 0.84rem;
+        font-weight: 650;
+      }
+
+      .field input {
+        width: 100%;
+        height: 49px;
+        padding: 0 14px;
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        outline: none;
+        background: rgba(7, 10, 7, 0.35);
+        color: var(--ink);
+        transition: border-color 160ms ease, box-shadow 160ms ease;
+      }
+
+      .field input::placeholder {
+        color: #737b70;
+      }
+
+      .field input:focus {
+        border-color: rgba(201, 239, 119, 0.72);
+        box-shadow: 0 0 0 3px rgba(201, 239, 119, 0.11);
+      }
+
+      .submit-button {
+        width: 100%;
+        margin-top: 4px;
+      }
+
+      .auth-switch {
+        margin: 22px 0 0;
+        color: var(--muted);
+        font-size: 0.87rem;
+        text-align: center;
+      }
+
+      .text-button {
+        padding: 0;
+        border: 0;
+        background: none;
+        color: var(--accent);
+        cursor: pointer;
+        font: inherit;
+        font-weight: 700;
+      }
+
+      .text-button:hover {
+        color: #d9f9a0;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+
+      .notice {
+        margin: 0 0 19px;
+        padding: 12px 14px;
+        border: 1px solid rgba(255, 182, 168, 0.22);
+        border-radius: 11px;
+        background: rgba(255, 182, 168, 0.08);
+        color: var(--danger);
+        font-size: 0.87rem;
+        line-height: 1.5;
+      }
+
+      .notice-success {
+        border-color: rgba(201, 239, 119, 0.22);
+        background: rgba(201, 239, 119, 0.07);
+        color: var(--accent);
+      }
+
+      .songs-area {
+        padding: 64px 0 90px;
+      }
+
+      .section-heading {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 24px;
+      }
+
+      .section-heading .eyebrow {
+        margin-bottom: 10px;
+      }
+
+      .section-heading h2 {
+        margin-bottom: 0;
+        font-size: clamp(1.7rem, 4vw, 2.35rem);
+      }
+
+      .section-description {
+        margin: 9px 0 0;
+        color: var(--muted);
+        font-size: 0.91rem;
+      }
+
+      .song-form-card {
+        margin-bottom: 36px;
+        padding: 25px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: var(--panel);
+      }
+
+      .song-form-heading {
+        margin-bottom: 20px;
+      }
+
+      .song-form-heading h3 {
+        margin: 0 0 7px;
+        font-size: 1.15rem;
+        letter-spacing: -0.035em;
+      }
+
+      .song-form-heading p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.86rem;
+      }
+
+      .song-form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0 18px;
+      }
+
+      .field input.input-invalid {
+        border-color: var(--danger);
+      }
+
+      .field-error {
+        margin: -2px 0 0;
+        color: var(--danger);
+        font-size: 0.78rem;
+        line-height: 1.4;
+      }
+
+      .song-form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+
+      .song-toolbar {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 16px;
+      }
+
+      .genre-search {
+        width: min(100%, 320px);
+      }
+
+      .genre-search label {
+        display: block;
+        margin-bottom: 8px;
+        color: #d9ddd1;
+        font-size: 0.8rem;
+        font-weight: 650;
+      }
+
+      .genre-search input {
+        width: 100%;
+        height: 44px;
+        padding: 0 13px;
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        outline: none;
+        background: rgba(7, 10, 7, 0.35);
+        color: var(--ink);
+      }
+
+      .genre-search input:focus {
+        border-color: rgba(201, 239, 119, 0.72);
+        box-shadow: 0 0 0 3px rgba(201, 239, 119, 0.11);
+      }
+
+      .genre-search input::placeholder {
+        color: #737b70;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+        border: 1px solid var(--line);
+        border-radius: 17px;
+        background: var(--panel);
+      }
+
+      .songs-table {
+        width: 100%;
+        min-width: 650px;
+        border-collapse: collapse;
+        text-align: left;
+      }
+
+      .songs-table th,
+      .songs-table td {
+        padding: 15px 18px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .songs-table th {
+        background: rgba(255, 255, 255, 0.025);
+        color: var(--muted);
+        font-size: 0.74rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+      }
+
+      .songs-table td {
+        color: #e4e6dc;
+        font-size: 0.9rem;
+      }
+
+      .songs-table tbody tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .songs-table tbody tr:hover {
+        background: rgba(255, 255, 255, 0.025);
+      }
+
+      .row-action-button {
+        min-height: 36px;
+        padding: 0 12px;
+        border-radius: 10px;
+        font-size: 0.8rem;
+      }
+
+      .row-actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .button-danger {
+        border-color: rgba(255, 182, 168, 0.24);
+        color: var(--danger);
+      }
+
+      .button-danger:hover:not(:disabled) {
+        border-color: rgba(255, 182, 168, 0.45);
+        background: rgba(255, 182, 168, 0.09);
+      }
+
+      .thumbnail-link,
+      .thumbnail-placeholder {
+        display: grid;
+        width: 112px;
+        height: 63px;
+        overflow: hidden;
+        place-items: center;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        background: #20271d;
+      }
+
+      .thumbnail-link img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .thumbnail-placeholder {
+        color: var(--muted);
+        font-size: 0.68rem;
+      }
+
+      .state-card {
+        padding: 42px 24px;
+        border: 1px dashed rgba(235, 239, 222, 0.2);
+        border-radius: 18px;
+        color: var(--muted);
+        text-align: center;
+      }
+
+      .state-card strong {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--ink);
+        font-size: 1rem;
+      }
+
+      .state-card p {
+        margin: 0;
+        font-size: 0.9rem;
+        line-height: 1.6;
+      }
+
+      .footer {
+        padding: 24px 0 30px;
+        border-top: 1px solid var(--line);
+        color: #7e867a;
+        font-size: 0.78rem;
+        text-align: center;
+      }
+
+      @media (max-width: 600px) {
+        .shell {
+          width: min(100% - 32px, 1120px);
+        }
+
+        .topbar {
+          min-height: 76px;
+        }
+
+        .intro {
+          margin: 60px auto 30px;
+        }
+
+        .auth-card {
+          padding: 24px 20px;
+        }
+
+        .songs-area {
+          padding-top: 48px;
+        }
+
+        .section-heading {
+          align-items: flex-start;
+        }
+
+        .song-toolbar {
+          justify-content: stretch;
+        }
+
+        .genre-search {
+          width: 100%;
+        }
+
+        .song-form-card {
+          padding: 21px 18px;
+        }
+
+        .song-form-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .song-form-actions {
+          flex-direction: column-reverse;
+        }
+
+        .song-form-actions .button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <header class="topbar shell">
+        <a class="brand" href="#" aria-label="NoiseSwap">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path
+                d="M4 10v4m4-8v12m4-15v18m4-14v10m4-7v4"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+          </span>
+          <span>NoiseSwap</span>
+        </a>
+        <button
+          v-if="token"
+          class="button button-quiet"
+          type="button"
+          @click="logout"
+        >
+          Keluar
+        </button>
+      </header>
+
+      <main class="shell">
+        <template v-if="!token">
+          <section class="intro">
+            <p class="eyebrow">Ruang untuk suara favoritmu</p>
+            <h1>Temukan irama<br /><span>versimu sendiri.</span></h1>
+            <p class="intro-copy">
+              Simpan dan nikmati kembali lagu-lagu yang membuat harimu terasa berbeda.
+            </p>
+          </section>
+
+          <section class="auth-card" aria-labelledby="auth-title">
+            <h2 id="auth-title">{{ isRegister ? 'Buat akun baru' : 'Selamat datang kembali' }}</h2>
+            <p class="card-copy">
+              {{ isRegister ? 'Daftar untuk mulai menyimpan koleksi lagumu.' : 'Masuk untuk membuka koleksi lagu milikmu.' }}
+            </p>
+
+            <p
+              v-if="notice"
+              class="notice"
+              :class="{ 'notice-success': noticeType === 'success' }"
+              role="status"
+              aria-live="polite"
+            >
+              {{ notice }}
+            </p>
+
+            <form @submit.prevent="submitAuth">
+              <div class="field">
+                <label for="username">Nama pengguna</label>
+                <input
+                  id="username"
+                  v-model.trim="form.username"
+                  type="text"
+                  name="username"
+                  autocomplete="username"
+                  placeholder="Masukkan nama pengguna"
+                  required
+                />
+              </div>
+              <div class="field">
+                <label for="password">Kata sandi</label>
+                <input
+                  id="password"
+                  v-model="form.password"
+                  type="password"
+                  name="password"
+                  :autocomplete="isRegister ? 'new-password' : 'current-password'"
+                  placeholder="Masukkan kata sandi"
+                  required
+                />
+              </div>
+              <button
+                class="button button-primary submit-button"
+                type="submit"
+                :disabled="busy"
+              >
+                {{ busy ? 'Mohon tunggu…' : (isRegister ? 'Daftar' : 'Masuk') }}
+              </button>
+            </form>
+
+            <p class="auth-switch">
+              <template v-if="isRegister">
+                Sudah punya akun?
+                <button class="text-button" type="button" @click="switchMode">
+                  Masuk di sini
+                </button>
+              </template>
+              <template v-else>
+                Belum punya akun?
+                <button class="text-button" type="button" @click="switchMode">
+                  Daftar di sini
+                </button>
+              </template>
+            </p>
+          </section>
+        </template>
+
+        <section v-else class="songs-area" aria-labelledby="songs-title">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Koleksi pribadimu</p>
+              <h2 id="songs-title">Daftar Lagu</h2>
+              <p class="section-description">
+                Lagu-lagu yang tersimpan di ruang dengarmu.
+              </p>
+            </div>
+            <button
+              class="button button-quiet"
+              type="button"
+              :disabled="loadingSongs"
+              @click="loadSongs"
+            >
+              {{ loadingSongs ? 'Memuat…' : 'Muat ulang' }}
+            </button>
+          </div>
+
+          <section class="song-form-card" aria-labelledby="song-form-title">
+            <div class="song-form-heading">
+              <h3 id="song-form-title">
+                {{ isEditingSong ? 'Edit Rekomendasi Lagu' : 'Tambah Rekomendasi Lagu' }}
+              </h3>
+              <p>
+                {{ isEditingSong ? 'Perbarui detail rekomendasi lagu ini.' : 'Bagikan lagu yang ingin kamu rekomendasikan.' }}
+              </p>
+            </div>
+
+            <p
+              v-if="songFormNotice"
+              class="notice"
+              :class="{ 'notice-success': songFormNoticeType === 'success' }"
+              role="status"
+              aria-live="polite"
+            >
+              {{ songFormNotice }}
+            </p>
+
+            <form novalidate @submit.prevent="saveSong">
+              <div class="song-form-grid">
+                <div class="field">
+                  <label for="song-title">Judul Lagu</label>
+                  <input
+                    id="song-title"
+                    v-model.trim="songForm.title"
+                    :class="{ 'input-invalid': songFieldErrors.title }"
+                    :aria-invalid="!!songFieldErrors.title"
+                    type="text"
+                    autocomplete="off"
+                    required
+                    @input="clearSongFieldError('title')"
+                  />
+                  <p v-if="songFieldErrors.title" class="field-error">
+                    {{ songFieldErrors.title }}
+                  </p>
+                </div>
+
+                <div class="field">
+                  <label for="song-artist">Nama Artis</label>
+                  <input
+                    id="song-artist"
+                    v-model.trim="songForm.artist"
+                    :class="{ 'input-invalid': songFieldErrors.artist }"
+                    :aria-invalid="!!songFieldErrors.artist"
+                    type="text"
+                    autocomplete="off"
+                    required
+                    @input="clearSongFieldError('artist')"
+                  />
+                  <p v-if="songFieldErrors.artist" class="field-error">
+                    {{ songFieldErrors.artist }}
+                  </p>
+                </div>
+
+                <div class="field">
+                  <label for="song-genre">Genre</label>
+                  <input
+                    id="song-genre"
+                    v-model.trim="songForm.genre"
+                    :class="{ 'input-invalid': songFieldErrors.genre }"
+                    :aria-invalid="!!songFieldErrors.genre"
+                    type="text"
+                    autocomplete="off"
+                    required
+                    @input="clearSongFieldError('genre')"
+                  />
+                  <p v-if="songFieldErrors.genre" class="field-error">
+                    {{ songFieldErrors.genre }}
+                  </p>
+                </div>
+
+                <div class="field">
+                  <label for="song-youtube-url">Link YouTube</label>
+                  <input
+                    id="song-youtube-url"
+                    v-model.trim="songForm.youtube_url"
+                    :class="{ 'input-invalid': songFieldErrors.youtube_url }"
+                    :aria-invalid="!!songFieldErrors.youtube_url"
+                    type="url"
+                    autocomplete="url"
+                    required
+                    @input="clearSongFieldError('youtube_url')"
+                  />
+                  <p v-if="songFieldErrors.youtube_url" class="field-error">
+                    {{ songFieldErrors.youtube_url }}
+                  </p>
+                </div>
+              </div>
+
+              <div class="song-form-actions">
+                <button
+                  class="button button-quiet"
+                  type="button"
+                  :disabled="savingSong"
+                  @click="resetSongForm"
+                >
+                  Batal
+                </button>
+                <button
+                  class="button button-primary"
+                  type="submit"
+                  :disabled="savingSong"
+                >
+                  {{ savingSong ? 'Menyimpan…' : 'Simpan' }}
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <p v-if="songError" class="notice" role="alert">{{ songError }}</p>
+
+          <div class="song-toolbar">
+            <div class="genre-search">
+              <label for="genre-search">Cari berdasarkan genre</label>
+              <input
+                id="genre-search"
+                v-model="genreSearch"
+                type="search"
+                placeholder="Ketik genre lagu…"
+              />
+            </div>
+          </div>
+
+          <div v-if="loadingSongs" class="state-card" role="status" aria-live="polite">
+            <strong>Sebentar, ya…</strong>
+            <p>Koleksi lagumu sedang dimuat.</p>
+          </div>
+          <div v-else-if="!songs.length && !songError" class="state-card">
+            <p>Daftar lagu masih kosong. Silakan tambahkan rekomendasi lagu baru.</p>
+          </div>
+          <div v-else-if="!filteredSongs.length && !songError" class="state-card">
+            <p>Tidak ada lagu dengan genre tersebut.</p>
+          </div>
+          <div v-else-if="!songError" class="table-wrap">
+            <table class="songs-table">
+              <thead>
+                <tr>
+                  <th scope="col">Sampul YouTube</th>
+                  <th scope="col">Judul Lagu</th>
+                  <th scope="col">Nama Artis</th>
+                  <th scope="col">Genre</th>
+                  <th scope="col">Ditambahkan oleh</th>
+                  <th scope="col">Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="song in filteredSongs" :key="song.id">
+                  <td>
+                    <a
+                      v-if="youtubeThumbnailUrl(song.youtube_url)"
+                      class="thumbnail-link"
+                      :href="song.youtube_url"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <img
+                        :src="youtubeThumbnailUrl(song.youtube_url)"
+                        :alt="`Sampul YouTube: ${song.title}`"
+                        loading="lazy"
+                      />
+                    </a>
+                    <span v-else class="thumbnail-placeholder">
+                      Tidak tersedia
+                    </span>
+                  </td>
+                  <td>{{ song.title }}</td>
+                  <td>{{ song.artist }}</td>
+                  <td>{{ song.genre }}</td>
+                  <td>{{ song.owner_username || 'Tidak diketahui' }}</td>
+                  <td>
+                    <div
+                      v-if="song.owner_username === loggedInUsername"
+                      class="row-actions"
+                    >
+                      <button
+                        class="button button-quiet row-action-button"
+                        type="button"
+                        :disabled="savingSong || deletingSongId === song.id"
+                        @click="editSong(song)"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        class="button button-quiet button-danger row-action-button"
+                        type="button"
+                        :disabled="savingSong || deletingSongId === song.id"
+                        @click="deleteSong(song)"
+                      >
+                        {{ deletingSongId === song.id ? 'Menghapus…' : 'Hapus' }}
+                      </button>
+                    </div>
+                    <span v-else>Hanya pemilik</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer shell">
+        Dibuat untuk menemani setiap suasana.
+      </footer>
+    </div>
+
+    <script type="module">
+      import { computed, createApp, onMounted, reactive, ref } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js';
+
+      const API_URL = '/api';
+
+      function usernameFromToken(accessToken) {
+        try {
+          const encodedPayload = accessToken.split('.')[1];
+          if (!encodedPayload) return '';
+          const base64 = encodedPayload.replace(/-/g, '+').replace(/_/g, '/');
+          const paddedBase64 = base64.padEnd(
+            base64.length + ((4 - (base64.length % 4)) % 4),
+            '=',
+          );
+          const bytes = atob(paddedBase64);
+          const payload = JSON.parse(
+            decodeURIComponent(
+              Array.from(bytes, (character) =>
+                `%${character.charCodeAt(0).toString(16).padStart(2, '0')}`,
+              ).join(''),
+            ),
+          );
+          return typeof payload.sub === 'string' ? payload.sub : '';
+        } catch {
+          return '';
+        }
+      }
+
+      createApp({
+        setup() {
+          const token = ref(localStorage.getItem('access_token'));
+          const loggedInUsername = ref(usernameFromToken(token.value || ''));
+          const isRegister = ref(false);
+          const busy = ref(false);
+          const loadingSongs = ref(false);
+          const savingSong = ref(false);
+          const deletingSongId = ref(null);
+          const isEditingSong = ref(false);
+          const editingSongId = ref(null);
+          const songs = ref([]);
+          const genreSearch = ref('');
+          const songForm = reactive({
+            title: '',
+            artist: '',
+            genre: '',
+            youtube_url: '',
+          });
+          const songFieldErrors = reactive({
+            title: '',
+            artist: '',
+            genre: '',
+            youtube_url: '',
+          });
+          const songFormNotice = ref('');
+          const songFormNoticeType = ref('');
+          const filteredSongs = computed(() => {
+            const query = genreSearch.value.trim().toLocaleLowerCase();
+            if (!query) return songs.value;
+            return songs.value.filter((song) =>
+              String(song.genre || '').toLocaleLowerCase().includes(query),
+            );
+          });
+          const songError = ref('');
+          const notice = ref('');
+          const noticeType = ref('');
+          const form = reactive({ username: '', password: '' });
+
+          function setNotice(message, type = 'error') {
+            notice.value = message;
+            noticeType.value = type;
+          }
+
+          function switchMode() {
+            isRegister.value = !isRegister.value;
+            notice.value = '';
+          }
+
+          function clearSession(message = '') {
+            localStorage.removeItem('access_token');
+            loggedInUsername.value = '';
+            token.value = null;
+            songs.value = [];
+            if (message) setNotice(message);
+          }
+
+          function messageForStatus(statusCode, registering) {
+            if (registering && statusCode === 409) {
+              return 'Nama pengguna tersebut sudah digunakan.';
+            }
+            if (!registering && statusCode === 401) {
+              return 'Nama pengguna atau kata sandi tidak sesuai.';
+            }
+            return 'Permintaan belum berhasil. Silakan coba lagi.';
+          }
+
+          function youtubeThumbnailUrl(value) {
+            if (typeof value !== 'string') return '';
+            try {
+              const url = new URL(value);
+              const host = url.hostname.toLowerCase().replace(/^www\./, '');
+              let videoId = '';
+              if (host === 'youtu.be') {
+                videoId = url.pathname.split('/').filter(Boolean)[0] || '';
+              } else if (
+                ['youtube.com', 'm.youtube.com', 'music.youtube.com', 'youtube-nocookie.com'].includes(host)
+              ) {
+                videoId =
+                  url.searchParams.get('v') ||
+                  url.pathname.match(/^\/(?:embed|shorts|live)\/([^/?]+)/)?.[1] ||
+                  '';
+              }
+              return /^[\w-]{11}$/.test(videoId)
+                ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+                : '';
+            } catch (error) {
+              if (error instanceof TypeError) return '';
+              throw error;
+            }
+          }
+
+          function clearSongFieldError(field) {
+            songFieldErrors[field] = '';
+            songFormNotice.value = '';
+          }
+
+          function editSong(song) {
+            songForm.title = song.title;
+            songForm.artist = song.artist;
+            songForm.genre = song.genre;
+            songForm.youtube_url = song.youtube_url;
+            songFieldErrors.title = '';
+            songFieldErrors.artist = '';
+            songFieldErrors.genre = '';
+            songFieldErrors.youtube_url = '';
+            songFormNotice.value = '';
+            songFormNoticeType.value = '';
+            isEditingSong.value = true;
+            editingSongId.value = song.id;
+          }
+
+          function resetSongForm() {
+            songForm.title = '';
+            songForm.artist = '';
+            songForm.genre = '';
+            songForm.youtube_url = '';
+            songFieldErrors.title = '';
+            songFieldErrors.artist = '';
+            songFieldErrors.genre = '';
+            songFieldErrors.youtube_url = '';
+            songFormNotice.value = '';
+            songFormNoticeType.value = '';
+            isEditingSong.value = false;
+            editingSongId.value = null;
+          }
+
+          async function saveSong() {
+            const requiredMessage = 'Kolom ini wajib diisi, tidak boleh kosong!';
+            let hasEmptyField = false;
+            for (const field of Object.keys(songForm)) {
+              if (!String(songForm[field]).trim()) {
+                songFieldErrors[field] = requiredMessage;
+                hasEmptyField = true;
+              } else {
+                songFieldErrors[field] = '';
+              }
+            }
+            songFormNotice.value = '';
+            if (hasEmptyField) return;
+
+            const editing = isEditingSong.value;
+            const songId = editingSongId.value;
+            savingSong.value = true;
+            try {
+              const response = await fetch(
+                editing ? `${API_URL}/songs/${songId}` : `${API_URL}/songs`,
+                {
+                  method: editing ? 'PUT' : 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token.value}`,
+                  },
+                  body: JSON.stringify({ ...songForm }),
+                },
+              );
+
+              if (response.status === 401 || response.status === 403) {
+                clearSession('Sesi berakhir. Silakan masuk kembali.');
+                return;
+              }
+              if (!response.ok) {
+                songFormNotice.value =
+                  editing && response.status === 404
+                    ? 'Lagu tidak ditemukan. Muat ulang daftar dan coba lagi.'
+                    : 'Rekomendasi lagu belum dapat disimpan. Silakan coba lagi.';
+                songFormNoticeType.value = 'error';
+                return;
+              }
+
+              const savedSong = await response.json();
+              if (editing) {
+                songs.value = songs.value.map((song) =>
+                  song.id === songId ? savedSong : song,
+                );
+              } else {
+                songs.value = [...songs.value, savedSong];
+              }
+              songError.value = '';
+              genreSearch.value = '';
+              resetSongForm();
+              songFormNotice.value = editing
+                ? 'Rekomendasi lagu berhasil diperbarui.'
+                : 'Rekomendasi lagu berhasil disimpan.';
+              songFormNoticeType.value = 'success';
+            } catch (error) {
+              if (error instanceof TypeError) {
+                songFormNotice.value = 'Tidak dapat terhubung ke server. Periksa koneksi lalu coba lagi.';
+                songFormNoticeType.value = 'error';
+              } else if (error instanceof SyntaxError) {
+                songFormNotice.value = 'Server memberikan respons yang tidak dapat dibaca.';
+                songFormNoticeType.value = 'error';
+              } else {
+                throw error;
+              }
+            } finally {
+              savingSong.value = false;
+            }
+          }
+
+          async function deleteSong(song) {
+            if (!window.confirm('Yakin mau menghapus lagu ini dari playlist?')) return;
+
+            deletingSongId.value = song.id;
+            songError.value = '';
+            try {
+              const response = await fetch(`${API_URL}/songs/${song.id}`, {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${token.value}` },
+              });
+
+              if (response.status === 401 || response.status === 403) {
+                clearSession('Sesi berakhir. Silakan masuk kembali.');
+                return;
+              }
+              if (!response.ok) {
+                songError.value =
+                  response.status === 404
+                    ? 'Lagu tidak ditemukan. Muat ulang daftar dan coba lagi.'
+                    : 'Lagu belum dapat dihapus. Silakan coba lagi.';
+                return;
+              }
+
+              songs.value = songs.value.filter((item) => item.id !== song.id);
+            } catch (error) {
+              if (error instanceof TypeError) {
+                songError.value = 'Tidak dapat terhubung ke server. Periksa koneksi lalu coba lagi.';
+              } else {
+                throw error;
+              }
+            } finally {
+              deletingSongId.value = null;
+            }
+          }
+
+          async function submitAuth() {
+            busy.value = true;
+            notice.value = '';
+            const registering = isRegister.value;
+            try {
+              const response = await fetch(
+                `${API_URL}/${registering ? 'register' : 'login'}`,
+                {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(form),
+                },
+              );
+
+              if (!response.ok) {
+                setNotice(messageForStatus(response.status, registering));
+                return;
+              }
+
+              if (registering) {
+                isRegister.value = false;
+                setNotice('Pendaftaran berhasil. Silakan masuk dengan akun barumu.', 'success');
+                return;
+              }
+
+              const result = await response.json();
+              if (!result.access_token) {
+                setNotice('Token masuk tidak ditemukan. Silakan coba lagi.');
+                return;
+              }
+
+              localStorage.setItem('access_token', result.access_token);
+              token.value = result.access_token;
+              loggedInUsername.value = usernameFromToken(result.access_token);
+              form.password = '';
+              await loadSongs();
+            } catch {
+              setNotice('Tidak dapat terhubung ke server. Pastikan layanan sedang berjalan.');
+            } finally {
+              busy.value = false;
+            }
+          }
+
+          async function loadSongs() {
+            if (!token.value) return;
+            loadingSongs.value = true;
+            songError.value = '';
+            try {
+              const response = await fetch(`${API_URL}/songs`, {
+                headers: { Authorization: `Bearer ${token.value}` },
+              });
+
+              if (response.status === 401 || response.status === 403) {
+                clearSession('Sesi berakhir. Silakan masuk kembali.');
+                return;
+              }
+              if (!response.ok) {
+                songError.value = 'Koleksi lagu belum dapat dimuat. Coba lagi sebentar.';
+                return;
+              }
+
+              songs.value = await response.json();
+            } catch {
+              songError.value = 'Tidak dapat terhubung ke server. Periksa koneksi lalu coba lagi.';
+            } finally {
+              loadingSongs.value = false;
+            }
+          }
+
+          function logout() {
+            clearSession();
+            form.password = '';
+            notice.value = '';
+            songError.value = '';
+            genreSearch.value = '';
+            isRegister.value = false;
+          }
+
+          onMounted(() => {
+            if (token.value) loadSongs();
+          });
+
+          return {
+            token,
+            loggedInUsername,
+            isRegister,
+            busy,
+            loadingSongs,
+            savingSong,
+            deletingSongId,
+            isEditingSong,
+            songs,
+            genreSearch,
+            filteredSongs,
+            songForm,
+            songFieldErrors,
+            songFormNotice,
+            songFormNoticeType,
+            songError,
+            notice,
+            noticeType,
+            form,
+            switchMode,
+            submitAuth,
+            loadSongs,
+            clearSongFieldError,
+            editSong,
+            resetSongForm,
+            saveSong,
+            deleteSong,
+            youtubeThumbnailUrl,
+            logout,
+          };
+        },
+      }).mount('#app');
+    </script>
+  </body>
+</html>

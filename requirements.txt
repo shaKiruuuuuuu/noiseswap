@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+sqlalchemy
+passlib[bcrypt]
+bcrypt<4.1
+pyjwt
+python-multipart
+psycopg2-binary
+pwdlib[argon2]
